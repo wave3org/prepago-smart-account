@@ -56,5 +56,9 @@
   "packageManager": "yarn@3.2.3",
   "engines": {
     "node": ">=20.18.3"
+  },
+  "dependencies": {
+    "@zerodev/session-key": "^5.5.4",
+    "permissionless": "^0.3.2"
   }
 }

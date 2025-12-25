@@ -1,0 +1,133 @@
+{
+  "address": "0x35A16E42A8345fCF74D4D45ed4177575073669b5",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "usuario",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "nuevoSaldo",
+          "type": "uint256"
+        }
+      ],
+      "name": "CancionReproducida",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "depositar",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reproducirCancion",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "saldoPorUsuario",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "valorPorCancion",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x37e2fa78867ee2ecf6589d38fd4cf45668a4ea4a335e8454d919a8f55ab790fd",
+  "receipt": {
+    "to": null,
+    "from": "0x4Eaa2Fd5fC5f17A77e0C0f7D4Bf296C37b8744C4",
+    "contractAddress": "0x35A16E42A8345fCF74D4D45ed4177575073669b5",
+    "transactionIndex": 49,
+    "gasUsed": "192189",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xd0af895c699dd6e595ec0cbe1ad2ff10262851de5c0c1c3077364bca9bab1652",
+    "transactionHash": "0x37e2fa78867ee2ecf6589d38fd4cf45668a4ea4a335e8454d919a8f55ab790fd",
+    "logs": [],
+    "blockNumber": 9908461,
+    "cumulativeGasUsed": "5598413",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "931dbc1c45da3f4b3b53e875b2a592c4",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"usuario\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nuevoSaldo\",\"type\":\"uint256\"}],\"name\":\"CancionReproducida\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"depositar\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reproducirCancion\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"saldoPorUsuario\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"valorPorCancion\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/BovedaMusical.sol\":\"BovedaMusical\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/BovedaMusical.sol\":{\"content\":\"//SPDX-License-Identifier: MIT\\npragma solidity >=0.8.0 <0.9.0;\\n\\ncontract BovedaMusical {\\n    uint256 public constant valorPorCancion = 1 wei;\\n    mapping(address => uint) public saldoPorUsuario;\\n\\n    event CancionReproducida(address indexed usuario, uint256 nuevoSaldo);\\n\\n    function depositar() public payable {\\n        require(msg.value >= valorPorCancion, \\\"Debe depositar al menos 1 wei por cancion\\\");\\n        saldoPorUsuario[msg.sender] += msg.value;\\n    }\\n\\n    function reproducirCancion() public {\\n        require(saldoPorUsuario[msg.sender] >= valorPorCancion, \\\"Saldo insuficiente para reproducir la cancion\\\");\\n        saldoPorUsuario[msg.sender] -= valorPorCancion;\\n    }\\n}\\n\",\"keccak256\":\"0xb34dc76dab1e8c729ef3938bb0a921680ea491a7c15be42e0703971ee5c27ab4\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610283806100206000396000f3fe60806040526004361061003f5760003560e01c806312abb5f5146100445780633d922f90146100835780636afd5a6e1461008d578063e8ddd4ee146100a2575b600080fd5b34801561005057600080fd5b5061007161005f3660046101db565b60006020819052908152604090205481565b60405190815260200160405180910390f35b61008b6100b7565b005b34801561009957600080fd5b50610071600181565b3480156100ae57600080fd5b5061008b610145565b600134101561011f5760405162461bcd60e51b815260206004820152602960248201527f44656265206465706f736974617220616c206d656e6f7320312077656920706f604482015268391031b0b731b4b7b760b91b60648201526084015b60405180910390fd5b336000908152602081905260408120805434929061013e908490610221565b9091555050565b33600090815260208190526040902054600111156101bb5760405162461bcd60e51b815260206004820152602d60248201527f53616c646f20696e737566696369656e7465207061726120726570726f64756360448201526c34b91036309031b0b731b4b7b760991b6064820152608401610116565b33600090815260208190526040812080546001929061013e90849061023a565b6000602082840312156101ed57600080fd5b81356001600160a01b038116811461020457600080fd5b9392505050565b634e487b7160e01b600052601160045260246000fd5b808201808211156102345761023461020b565b92915050565b818103818111156102345761023461020b56fea264697066735822122006c211469a4aa1c4fdc205f5b8e146c3f51ae1c226bebfed4fdbe9ae18360f7364736f6c63430008140033",
+  "deployedBytecode": "0x60806040526004361061003f5760003560e01c806312abb5f5146100445780633d922f90146100835780636afd5a6e1461008d578063e8ddd4ee146100a2575b600080fd5b34801561005057600080fd5b5061007161005f3660046101db565b60006020819052908152604090205481565b60405190815260200160405180910390f35b61008b6100b7565b005b34801561009957600080fd5b50610071600181565b3480156100ae57600080fd5b5061008b610145565b600134101561011f5760405162461bcd60e51b815260206004820152602960248201527f44656265206465706f736974617220616c206d656e6f7320312077656920706f604482015268391031b0b731b4b7b760b91b60648201526084015b60405180910390fd5b336000908152602081905260408120805434929061013e908490610221565b9091555050565b33600090815260208190526040902054600111156101bb5760405162461bcd60e51b815260206004820152602d60248201527f53616c646f20696e737566696369656e7465207061726120726570726f64756360448201526c34b91036309031b0b731b4b7b760991b6064820152608401610116565b33600090815260208190526040812080546001929061013e90849061023a565b6000602082840312156101ed57600080fd5b81356001600160a01b038116811461020457600080fd5b9392505050565b634e487b7160e01b600052601160045260246000fd5b808201808211156102345761023461020b565b92915050565b818103818111156102345761023461020b56fea264697066735822122006c211469a4aa1c4fdc205f5b8e146c3f51ae1c226bebfed4fdbe9ae18360f7364736f6c63430008140033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 8,
+        "contract": "contracts/BovedaMusical.sol:BovedaMusical",
+        "label": "saldoPorUsuario",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_uint256)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
