@@ -512,22 +512,78 @@ const reproducirCancion = async () => {
 
 | Aspecto | depositar() | reproducirCancion() |
 |---------|-------------|---------------------|
-| Validator usado | ECDSA (sudo) | Permission (session key) |
-| Requiere MetaMask | ✅ Sí (firma) | ❌ No (automático) |
-| Envía ETH | ✅ Sí (10 wei) | ❌ No |
-| Permisos | Completos | Solo esta función |
+| Validator usado | Permission (session key) | Permission (session key) |
+| Requiere MetaMask popup | ❌ No (automático) | ❌ No (automático) |
+| Envía ETH (value) | ✅ Sí (10 wei) | ❌ No |
+| valueLimit permitido | 1000 wei | 0 wei |
 
-**¿Cómo decide qué validator usar?**
+**Importante**: AMBAS funciones usan el Permission Validator con session key, por eso ninguna abre popup de MetaMask.
 
-El Kernel Account selecciona automáticamente:
-- Si la operación está permitida por el `regular` validator → usa session key
-- Si no está permitida → requiere el `sudo` validator (MetaMask)
+**¿Cuándo se usa MetaMask entonces?**
 
-Por eso `reproducirCancion()` no pide aprobación, pero si intentas llamar otra función (ej: `retirar()`), pedirá MetaMask.
+MetaMask solo aparece **una vez al inicio** para:
+1. ✅ Conectar la wallet (RainbowKit)
+2. ✅ Firmar la creación del Kernel Account
+3. ✅ Autorizar el Permission Validator con la session key
+
+**Después de eso:**
+- ❌ NO hay más popups de MetaMask
+- ✅ Todo funciona automáticamente con la session key
+- ✅ El Kernel Account ejecuta las transacciones
+- ✅ El Paymaster paga el gas
+
+Si intentas una operación NO permitida (ej: una función no configurada en permissions), entonces sí requeriría el ECDSA validator (sudo) y pediría MetaMask.
 
 ## 🚀 Cómo Ejecutar
 
-### ⚠️ Setup Inicial Crítico: Fondear tu Kernel Account
+### 📝 Paso 1: Crear Cuenta en ZeroDev y Obtener API Key
+
+Antes de comenzar, necesitas una cuenta en ZeroDev para obtener el RPC endpoint:
+
+1. **Crear cuenta en ZeroDev**:
+   - Ve a [https://zerodev.app/](https://zerodev.app/)
+   - Click en "Sign Up" o "Get Started"
+   - Crea tu cuenta (puedes usar Google, GitHub, etc.)
+
+2. **Crear un nuevo proyecto**:
+   - Una vez dentro del dashboard, click en "Create Project"
+   - Nombre del proyecto: `MusicVault` (o el que prefieras)
+   - Selecciona la red: **Sepolia** (testnet)
+   - Click en "Create"
+
+3. **Obtener el RPC URL**:
+   - En tu proyecto, ve a la sección "API Keys" o "Settings"
+   - Copia el **Bundler RPC URL** - se verá algo así:
+     ```
+     https://rpc.zerodev.app/api/v2/bundler/YOUR_PROJECT_ID
+     ```
+   - Este es tu `NEXT_PUBLIC_ZERODEV_RPC` 🔑
+
+### 🔧 Paso 2: Configurar Variables de Entorno
+
+**Para desarrollo local:**
+
+Crea el archivo `.env.local` en `packages/nextjs/`:
+
+```bash
+# packages/nextjs/.env.local
+NEXT_PUBLIC_ZERODEV_RPC=https://rpc.zerodev.app/api/v2/bundler/YOUR_PROJECT_ID
+```
+
+**Para producción en Render:**
+
+Ve a tu servicio en Render Dashboard:
+1. Click en tu servicio
+2. Ve a "Environment" en el menú lateral
+3. Click "Add Environment Variable"
+4. Agrega:
+   - **Key**: `NEXT_PUBLIC_ZERODEV_RPC`
+   - **Value**: Tu URL de ZeroDev
+5. Click "Save Changes"
+
+⚠️ **Importante**: Las variables de entorno en Render requieren un nuevo deploy para aplicarse.
+
+### ⚠️ Paso 3: Setup Inicial - Fondear tu Kernel Account
 
 Antes de poder usar la app, necesitas fondos en tu Kernel Account:
 
@@ -536,25 +592,19 @@ Antes de poder usar la app, necesitas fondos en tu Kernel Account:
 yarn install
 ```
 
-2. **Configurar variables de entorno**:
-```bash
-# packages/nextjs/.env.local
-NEXT_PUBLIC_ZERODEV_RPC=tu_url_de_zerodev
-```
-
-3. **Deploy del contrato**:
+2. **Deploy del contrato**:
 ```bash
 cd packages/hardhat
 yarn deploy --network sepolia
 ```
 
-4. **Ejecutar frontend**:
+3. **Ejecutar frontend**:
 ```bash
 cd packages/nextjs
 yarn dev
 ```
 
-5. **🔑 PASO CRÍTICO - Fondear tu Kernel Account**:
+4. **🔑 PASO CRÍTICO - Fondear tu Kernel Account**:
 
    a. **Conectar MetaMask** en la app
    
@@ -1533,24 +1583,85 @@ NEXT_PUBLIC_ZERODEV_RPC=https://rpc.zerodev.app/api/v3/...
 
 **El proyecto está configurado para desplegarse automáticamente en Render:**
 
-1. **Dockerfile en la raíz** - Render lo detecta automáticamente
-2. **Variables de entorno** - Se configuran en Render Dashboard:
-   - `NEXT_PUBLIC_ZERODEV_RPC` (obligatorio)
-   - `DOCKER_BUILD=true` (automático)
-3. **Puerto expuesto**: 3000
-4. **Comando**: `node packages/nextjs/server.js` (automático)
+#### 🎯 Deploy Automático con GitHub Actions
 
-**Pasos para deployar en Render:**
+Cada vez que hagas **push a main**, el proyecto se despliega automáticamente:
 
-1. Conectar repositorio de GitHub
-2. Seleccionar "Docker" como tipo de servicio
-3. Agregar variable de entorno: `NEXT_PUBLIC_ZERODEV_RPC`
-4. Deploy automático! 🚀
+1. **GitHub Actions** detecta el push a main
+2. Ejecuta el workflow `.github/workflows/deploy.yaml`
+3. Notifica a Render mediante el **Deploy Hook URL**
+4. Render **clona tu repositorio** desde GitHub
+5. Render **buildea la imagen Docker** con tus cambios
+6. Render **despliega** la nueva versión automáticamente
 
-**Importante para Render:**
+**Configuración del Deploy Hook:**
+
+1. **En Render Dashboard**:
+   - Ve a tu servicio → Settings
+   - Busca la sección "Deploy Hook"
+   - Copia la URL (se verá como `https://api.render.com/deploy/srv-xxxxx?key=xxxxx`)
+
+2. **En GitHub**:
+   - Ve a tu repositorio → Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - **Name**: `RENDER_DEPLOY_HOOK_URL`
+   - **Value**: Pega la URL del deploy hook de Render
+   - Click "Add secret"
+
+3. **¡Listo!** Ahora cada push a main despliega automáticamente 🚀
+
+**El workflow está en** `.github/workflows/deploy.yaml`:
+```yaml
+name: Deploy to Render
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+```
+
+#### 📋 Variables de Entorno en Render
+
+**Se configuran en Render Dashboard:**
+
+1. Ve a tu servicio en Render
+2. Click en "Environment" en el menú lateral
+3. Agrega las siguientes variables:
+   - **`NEXT_PUBLIC_ZERODEV_RPC`** (obligatorio) - Tu RPC URL de ZeroDev
+   - `DOCKER_BUILD=true` (opcional, lo detecta automático)
+
+4. Click "Save Changes"
+
+⚠️ **Importante**: 
 - Las variables `NEXT_PUBLIC_*` se embeden en el bundle durante el build
 - Render pasa las env vars como `ARG` al Dockerfile automáticamente
-- Si cambias la variable, necesitas re-deployar (rebuild completo)
+- Si cambias una variable, necesitas hacer un nuevo deploy (se puede hacer manual desde Render o push a main)
+
+#### 🐳 Configuración Docker en Render
+
+**Render detecta automáticamente:**
+- ✅ **Dockerfile en la raíz** del proyecto
+- ✅ **Puerto expuesto**: 3000
+- ✅ **Comando**: `node packages/nextjs/server.js`
+
+**Pasos para el primer deploy manual en Render:**
+
+1. Conectar repositorio de GitHub a Render
+2. Seleccionar "Web Service"
+3. Render detecta Docker automáticamente
+4. Agregar variable de entorno: `NEXT_PUBLIC_ZERODEV_RPC`
+5. Click en "Create Web Service"
+6. ¡Deploy automático! 🚀
+
+**Después del primer deploy**, cada push a main despliega automáticamente gracias al workflow de GitHub Actions.
 
 ### .dockerignore
 
