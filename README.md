@@ -51,7 +51,7 @@
 1. **Instala MetaMask** (si no lo tienes)
 2. **Cambia a Sepolia Testnet** en MetaMask
 3. **Obtén Sepolia ETH gratis**:
-   - Opción 1: Google "sepolia faucet" y usa cualquiera
+   - **Recomendado**: [Google Cloud Sepolia Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia) ⭐
    - Opción 2: [Alchemy Sepolia Faucet](https://sepoliafaucet.com/)
    - Opción 3: [Infura Sepolia Faucet](https://www.infura.io/faucet/sepolia)
    - Necesitas ~0.01 ETH (es gratis, son tokens de prueba)
