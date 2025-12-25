@@ -13,6 +13,7 @@ import { toECDSASigner } from '@zerodev/permissions/signers'
 import { toCallPolicy, CallPolicyVersion } from '@zerodev/permissions/policies'
 import deployedContracts from "~~/contracts/deployedContracts"
 import type { NextPage } from "next";
+import toast from 'react-hot-toast';
 
 const chain = sepolia 
 const entryPoint = getEntryPoint("0.7")
@@ -162,10 +163,32 @@ const Home: NextPage = () => {
             setLastTxHash(txHash)
             console.log("Transaction hash:", txHash)
             
-            alert(receipt.success ? `¡Canción reproducida!\nTx: ${txHash}` : "Error al reproducir")
+            if (receipt.success) {
+                toast.success(`🎵 ¡Canción reproducida!`, {
+                    style: {
+                        background: '#dcfce7',
+                        color: '#166534',
+                        border: '2px solid #4ade80',
+                    },
+                });
+            } else {
+                toast.error('Error al reproducir', {
+                    style: {
+                        background: '#fee2e2',
+                        color: '#991b1b',
+                        border: '2px solid #ef4444',
+                    },
+                });
+            }
         } catch (error) {
             console.error("Error:", error)
-            alert("Error: " + (error as any).message)
+            toast.error(`Error: ${(error as any).message}`, {
+                style: {
+                    background: '#fee2e2',
+                    color: '#991b1b',
+                    border: '2px solid #ef4444',
+                },
+            });
         } finally {
             setLoading(false)
         }
@@ -226,9 +249,21 @@ const Home: NextPage = () => {
                     args: [kernelClient.account.address],
                 })
                 setBalance(bal as bigint)
-                alert("¡Depositado!")
+                toast.success('✅ ¡Depositado exitosamente!', {
+                    style: {
+                        background: '#dcfce7',
+                        color: '#166534',
+                        border: '2px solid #4ade80',
+                    },
+                });
             } else {
-                alert("Error al depositar")
+                toast.error('Error al depositar', {
+                    style: {
+                        background: '#fee2e2',
+                        color: '#991b1b',
+                        border: '2px solid #ef4444',
+                    },
+                });
             }
         } catch (error) {
             console.error("Error completo:", error)
@@ -259,20 +294,23 @@ const Home: NextPage = () => {
                 
                 const balanceInEth = (Number(currentBalance) / 1e18).toFixed(6)
                 
-                alert(`🔴 AA23 ERROR - DEBUGGING\n\n` +
-                      `Tu balance: ${currentBalance} wei (${balanceInEth} ETH)\n` +
-                      `Esto ES SUFICIENTE para 10 wei + gas!\n\n` +
-                      `Revert code: ${revertReason}\n` +
-                      `Esto sugiere que NO es solo falta de fondos.\n\n` +
-                      `POSIBLES CAUSAS:\n` +
-                      `1. Problema con nonce/validation\n` +
-                      `2. Bug en Kernel Account validator\n` +
-                      `3. Problema con paymaster sponsorship\n` +
-                      `4. Gas estimation incorrecta\n\n` +
-                      `Revisa la CONSOLA para más detalles.\n` +
-                      `Error: ${errorDetails}`)
+                toast.error(`AA23 ERROR: Tu balance ${currentBalance} wei (${balanceInEth} ETH). Revisa la consola para detalles.`, {
+                    duration: 6000,
+                    style: {
+                        background: '#fee2e2',
+                        color: '#991b1b',
+                        border: '2px solid #ef4444',
+                    },
+                });
             } else {
-                alert("Error: " + errorMsg + "\n\nDetails: " + errorDetails)
+                toast.error(`Error: ${errorMsg}`, {
+                    duration: 5000,
+                    style: {
+                        background: '#fee2e2',
+                        color: '#991b1b',
+                        border: '2px solid #ef4444',
+                    },
+                });
             }
         } finally {
             setLoading(false)
@@ -309,7 +347,9 @@ const Home: NextPage = () => {
                         <button
                             onClick={() => {
                                 navigator.clipboard.writeText(deployedContracts[chain.id].BovedaMusical.address);
-                                alert('Dirección del contrato copiada!');
+                                toast.success('Dirección del contrato copiada!', {
+                                    duration: 2000,
+                                });
                             }}
                             className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600"
                         >
@@ -401,7 +441,9 @@ const Home: NextPage = () => {
                             <button
                                 onClick={() => {
                                     navigator.clipboard.writeText(kernelAddress);
-                                    alert('Dirección copiada!');
+                                    toast.success('Dirección copiada!', {
+                                        duration: 2000,
+                                    });
                                 }}
                                 className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                             >

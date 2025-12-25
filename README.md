@@ -295,7 +295,7 @@ mapping(address => uint) public saldoPorUsuario;
 
 **Importante**: El `msg.sender` es tu **Kernel Account**, no tu EOA de MetaMask.
 
-### `/packages/nextjs/app/cuenta/page.tsx`
+### `/packages/nextjs/app/page.tsx`
 
 Página principal con la lógica de Account Abstraction.
 
@@ -1261,10 +1261,49 @@ await kernelClient.sendUserOperation({
 
 ## 📌 Mejoras Sugeridas para Producción
 
-### 1. Mostrar Balance del Kernel Account
+### 1. Migrar a Base Sepolia (L2) en lugar de Sepolia
+
+**Por qué:**
+- ⚡ **Más rápido**: Las L2 procesan transacciones mucho más rápido que L1
+- 💰 **Gas más barato**: Aunque usamos paymaster, las operaciones son más económicas
+- 🚀 **Mejor UX**: Confirmaciones instantáneas mejoran la experiencia del usuario
+- 📈 **Escalabilidad**: Soporta más transacciones por segundo
+
+**Cambios necesarios:**
 
 ```typescript
-// En cuenta/page.tsx
+// packages/nextjs/app/page.tsx
+import { baseSepolia } from 'viem/chains'
+
+const chain = baseSepolia // En lugar de sepolia
+```
+
+```typescript
+// packages/hardhat/hardhat.config.ts
+const config: HardhatUserConfig = {
+  networks: {
+    baseSepolia: {
+      url: "https://sepolia.base.org",
+      accounts: [deployerPrivateKey],
+      chainId: 84532,
+    },
+  },
+};
+```
+
+**Desplegar contratos en Base Sepolia:**
+```bash
+yarn hardhat deploy --network baseSepolia
+```
+
+**Obtener ETH de testnet:**
+- [Base Sepolia Faucet](https://www.coinbase.com/faucets/base-ethereum-goerli-faucet)
+- [Alchemy Base Sepolia Faucet](https://www.alchemy.com/faucets/base-sepolia)
+
+### 2. Mostrar Balance del Kernel Account
+
+```typescript
+// En packages/nextjs/app/page.tsx
 const [kernelEthBalance, setKernelEthBalance] = useState<bigint>();
 
 useEffect(() => {
