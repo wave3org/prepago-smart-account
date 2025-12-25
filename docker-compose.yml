@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_ZERODEV_RPC=${NEXT_PUBLIC_ZERODEV_RPC}
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_ZERODEV_RPC=${NEXT_PUBLIC_ZERODEV_RPC}
+    restart: unless-stopped

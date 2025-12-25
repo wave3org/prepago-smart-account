@@ -1,0 +1,39 @@
+# Ignorar node_modules en todos lados
+**/node_modules
+node_modules
+
+# Ignorar archivos git y build
+.git
+**/.git
+.next
+**/.next
+dist
+build
+.cache
+.turbo
+coverage
+
+# Ignorar logs y temporales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Ignorar IDE
+.vscode
+.idea
+.cursor
+
+# Ignorar env locales
+.env*.local
+
+# Ignorar otros packages del monorepo
+packages/hardhat
+
+# Ignorar carpeta deploy vieja
+packages/nextjs/deploy
+
