@@ -1,6 +1,116 @@
 # MusicVault - Account Abstraction con ZeroDev
 
-## 📚 ¿Qué es esto?
+## 📑 Índice
+
+1. [🌐 Aplicación en Vivo](#-aplicación-en-vivo)
+2. [⚡ Quick Start - Cómo Usar la App](#-quick-start---cómo-usar-la-app)
+   - [Paso 1: Prepara tu Wallet](#paso-1-prepara-tu-wallet)
+   - [Paso 2: Conecta y Crea tu Smart Wallet](#paso-2-conecta-y-crea-tu-smart-wallet)
+   - [Paso 3: Fondea tu Kernel Account](#paso-3-fondea-tu-kernel-account)
+   - [Paso 4: Deposita en la Bóveda Musical](#paso-4-deposita-en-la-bóveda-musical)
+   - [Paso 5: ¡Escucha Música!](#paso-5-escucha-música)
+3. [📚 ¿Qué es esto?](#-qué-es-esto)
+4. [🎯 Conceptos Clave](#-conceptos-clave)
+   - [⚠️ IMPORTANTE: Entendiendo las Direcciones](#️-importante-entendiendo-las-direcciones)
+   - [Flujo de Fondos Completo](#flujo-de-fondos-completo)
+   - [Account Abstraction (Abstracción de Cuentas)](#account-abstraction-abstracción-de-cuentas)
+   - [Flujo de Transacciones](#flujo-de-transacciones)
+   - [Componentes del Sistema](#componentes-del-sistema)
+5. [🔍 Cómo Ver las Transacciones en Sepolia](#-cómo-ver-las-transacciones-en-sepolia)
+6. [🏗️ Arquitectura del Código](#️-arquitectura-del-código)
+7. [🚀 Cómo Ejecutar](#-cómo-ejecutar)
+8. [🔑 Puntos Importantes](#-puntos-importantes)
+   - [Session Keys vs Permisos Completos](#session-keys-vs-permisos-completos)
+   - [¿Por qué usar Session Keys?](#por-qué-usar-session-keys)
+   - [Seguridad](#seguridad)
+9. [📖 Recursos](#-recursos)
+10. [🤝 Contribuir](#-contribuir)
+11. [📝 Notas Técnicas](#-notas-técnicas)
+    - [Estructura de una UserOperation](#estructura-de-una-useroperation)
+    - [Anatomía del Kernel Account](#anatomía-del-kernel-account)
+    - [Call Flow Detallado](#call-flow-detallado)
+    - [Ejemplo de CallData Encoding](#ejemplo-de-calldata-encoding)
+    - [Políticas Avanzadas](#políticas-avanzadas)
+    - [Gas y Paymaster](#gas-y-paymaster)
+    - [Debugging](#debugging)
+    - [TypeScript Types](#typescript-types)
+12. [🐛 Troubleshooting](#-troubleshooting)
+13. [📌 Mejoras Sugeridas para Producción](#-mejoras-sugeridas-para-producción)
+14. [🐳 Docker y Deployment](#-docker-y-deployment)
+
+---
+
+## � Aplicación en Vivo
+
+**🎵 Prueba la app ahora: [https://prepago-smart-account.onrender.com/](https://prepago-smart-account.onrender.com/)**
+
+## ⚡ Quick Start - Cómo Usar la App
+
+### Paso 1: Prepara tu Wallet
+
+1. **Instala MetaMask** (si no lo tienes)
+2. **Cambia a Sepolia Testnet** en MetaMask
+3. **Obtén Sepolia ETH gratis**:
+   - Opción 1: Google "sepolia faucet" y usa cualquiera
+   - Opción 2: [Alchemy Sepolia Faucet](https://sepoliafaucet.com/)
+   - Opción 3: [Infura Sepolia Faucet](https://www.infura.io/faucet/sepolia)
+   - Necesitas ~0.01 ETH (es gratis, son tokens de prueba)
+
+### Paso 2: Conecta y Crea tu Smart Wallet
+
+1. Abre [https://prepago-smart-account.onrender.com/](https://prepago-smart-account.onrender.com/)
+2. Click en **"Connect Wallet"** (arriba a la derecha)
+3. Acepta la conexión en MetaMask (popup de MetaMask aparecerá **una sola vez**)
+4. La app creará automáticamente tu **Kernel Account** (Smart Wallet)
+5. Verás dos direcciones:
+   - **Tu dirección de MetaMask**: `0xYourMetaMask...` (tu EOA)
+   - **Kernel Wallet Address**: `0xYourKernel...` (tu Smart Wallet - esta es tu ID real)
+
+### Paso 3: Fondea tu Kernel Account
+
+**⚠️ IMPORTANTE**: Tu Smart Wallet (Kernel Account) está vacía, necesita ETH para depositar.
+
+1. Copia la dirección de **"Kernel Wallet Address"** (hay un botón para copiar)
+2. Abre MetaMask
+3. Envía **0.001 ETH** (o más) a esa dirección del Kernel
+4. Espera ~15 segundos
+5. Refresca la página - verás el balance actualizado en "Kernel ETH Balance"
+
+### Paso 4: Deposita en la Bóveda Musical
+
+1. En "Balance en BovedaMusical" click en **"Depositar 100 wei"**
+2. **NO habrá popup de MetaMask** - la transacción se firma automáticamente con session key
+3. Verás una notificación de éxito cuando complete
+4. El saldo en "Balance en BovedaMusical" se actualizará a 100 wei
+
+### Paso 5: ¡Escucha Música!
+
+1. Click en **"Reproducir Canción (1 wei)"**
+2. **NO habrá popup de MetaMask** - gasless transaction!
+3. Verás la notificación: "🎵 Canción reproducida!"
+4. Tu saldo bajará de 100 → 99 → 98... con cada canción
+
+### 💡 ¿Por Qué No Hay Popups de MetaMask?
+
+Esta es la magia de **Account Abstraction con Session Keys**:
+
+- ✅ Solo firmas **una vez** al conectar (crear el Kernel Account)
+- ✅ Después, todas las transacciones usan **session keys** (sin popups)
+- ✅ El **Paymaster** paga el gas (transacciones gratis para ti)
+- ✅ Las notificaciones que ves son de la app, no de MetaMask
+
+**Esto es 100 veces mejor que Web3 tradicional donde cada click = popup de MetaMask!**
+
+### 🔍 Ver tus Transacciones en Etherscan
+
+Cada vez que reproduces o depositas, verás links a Etherscan:
+- Click en "Ver en Etherscan" para ver la transacción
+- Busca tu **Kernel Wallet Address** en [Sepolia Etherscan](https://sepolia.etherscan.io/)
+- En la pestaña **"Internal Txns"** verás las llamadas a BovedaMusical
+
+---
+
+## �📚 ¿Qué es esto?
 
 MusicVault es un proyecto que demuestra **Account Abstraction (ERC-4337)** usando ZeroDev SDK. Permite a los usuarios reproducir canciones pagando con saldo depositado en un contrato inteligente, utilizando billeteras inteligentes (smart wallets) en lugar de EOAs tradicionales.
 
@@ -1306,3 +1416,111 @@ const depositar = async () => {
 ```
 
 Estas mejoras harán que la experiencia sea mucho más clara y evitarán confusión sobre las direcciones y fondos.
+
+## 🐳 Docker y Deployment
+
+### Standalone Next.js
+
+Este proyecto usa **Next.js Standalone Output** para crear builds optimizados y ultra-ligeros:
+
+```typescript
+// next.config.ts
+if (process.env.DOCKER_BUILD === "true") {
+  nextConfig.output = "standalone";
+}
+```
+
+**¿Qué hace standalone?**
+- Genera solo los archivos necesarios en `.next/standalone`
+- Incluye un `server.js` listo para producción
+- Elimina `node_modules` innecesarios
+- Reduce el tamaño de la imagen Docker ~70%
+
+### Dockerfile
+
+El proyecto incluye un Dockerfile multi-stage optimizado para monorepos con Yarn 3:
+
+```dockerfile
+# Stage 1: Builder - compila la app
+FROM node:20-alpine AS builder
+WORKDIR /app
+# Copia configuración de Yarn 3
+COPY .yarnrc.yml .yarn yarn.lock package.json ./
+COPY packages/nextjs/package.json ./packages/nextjs/
+RUN corepack enable && yarn install
+COPY packages/nextjs ./packages/nextjs
+RUN yarn build
+
+# Stage 2: Runner - imagen final ligera
+FROM node:20-alpine AS runner
+WORKDIR /app
+# Solo copia lo necesario del standalone
+COPY --from=builder /app/packages/nextjs/.next/standalone ./
+COPY --from=builder /app/packages/nextjs/.next/static ./packages/nextjs/.next/static
+COPY --from=builder /app/packages/nextjs/public ./packages/nextjs/public
+CMD ["node", "packages/nextjs/server.js"]
+```
+
+**Características:**
+- ✅ Multi-stage build (builder + runner)
+- ✅ Soporta Yarn 3 workspaces (monorepo)
+- ✅ Variables de entorno en build-time (`ARG NEXT_PUBLIC_ZERODEV_RPC`)
+- ✅ Ignora telemetría de Next.js
+- ✅ Ignora errores de ESLint/TypeScript en build (solo para Docker)
+- ✅ Imagen final ~200MB vs ~800MB sin standalone
+
+### Docker Compose (Local)
+
+```bash
+# Iniciar en modo desarrollo
+docker compose up -d
+
+# Ver logs
+docker compose logs -f frontend
+
+# Rebuildir después de cambios
+docker compose up --build -d
+
+# Parar todo
+docker compose down
+```
+
+El archivo `.env` en la raíz contiene las variables necesarias:
+```env
+NEXT_PUBLIC_ZERODEV_RPC=https://rpc.zerodev.app/api/v3/...
+```
+
+### Deployment en Render
+
+**El proyecto está configurado para desplegarse automáticamente en Render:**
+
+1. **Dockerfile en la raíz** - Render lo detecta automáticamente
+2. **Variables de entorno** - Se configuran en Render Dashboard:
+   - `NEXT_PUBLIC_ZERODEV_RPC` (obligatorio)
+   - `DOCKER_BUILD=true` (automático)
+3. **Puerto expuesto**: 3000
+4. **Comando**: `node packages/nextjs/server.js` (automático)
+
+**Pasos para deployar en Render:**
+
+1. Conectar repositorio de GitHub
+2. Seleccionar "Docker" como tipo de servicio
+3. Agregar variable de entorno: `NEXT_PUBLIC_ZERODEV_RPC`
+4. Deploy automático! 🚀
+
+**Importante para Render:**
+- Las variables `NEXT_PUBLIC_*` se embeden en el bundle durante el build
+- Render pasa las env vars como `ARG` al Dockerfile automáticamente
+- Si cambias la variable, necesitas re-deployar (rebuild completo)
+
+### .dockerignore
+
+El proyecto ignora archivos innecesarios para optimizar el build:
+```
+**/node_modules
+.git
+.next
+packages/hardhat    # No necesitamos el backend en el frontend
+```
+
+Esto reduce el tamaño del contexto de build de ~500MB a ~50MB.
